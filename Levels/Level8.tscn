@@ -41,7 +41,7 @@ position = Vector2( 72, 96 )
 
 [node name="SceneChanger" parent="." instance=ExtResource( 6 )]
 position = Vector2( 264, 104 )
-SCENE_NAME = "Level9"
+SCENE_NAME = "Level9.tscn"
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 21, 123 )
