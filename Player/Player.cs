@@ -73,6 +73,7 @@ public class Player : KinematicBody2D
                 HandleLadderStates();
                 UpdateVelocityX(delta);
                 UpdateVelocityClimb(delta);
+                HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
 
