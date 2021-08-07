@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://TileMaps/TMBlocks.tscn" type="PackedScene" id=2]
@@ -8,8 +8,13 @@
 [ext_resource path="res://Assets/SceneChanger.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Assets/Button.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Assets/Door.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Assets/main_menu/export.png" type="Texture" id=9]
 
 [node name="World" type="Node2D"]
+
+[node name="bg2" type="Sprite" parent="."]
+position = Vector2( 128, 72 )
+texture = ExtResource( 9 )
 
 [node name="TMDanger" parent="." instance=ExtResource( 3 )]
 tile_data = PoolIntArray( 589837, -1073741824, 1, 720903, 0, 0, 720904, 0, 0, 720905, 0, 0, 720906, 0, 0, 851981, -1073741824, 1, 851983, -1073741824, 1, 917518, -1073741824, 1, 917523, -1073741824, 1, 917530, -1073741824, 1, 983060, -1073741824, 1, 983061, -1073741824, 1, 983065, -1073741824, 1 )
