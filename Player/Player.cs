@@ -22,6 +22,7 @@ public class Player : KinematicBody2D
     private PackedScene projectile = null;
     private RayCast2D floorRayLeft = null;
     private RayCast2D floorRayRight = null;
+    private AnimatedSprite animatedSprite = null;
     
     // Player Constants
     [Export] int ACCELERATION = 1000;
@@ -53,12 +54,22 @@ public class Player : KinematicBody2D
 
         floorRayLeft = GetNode<RayCast2D>("FloorRayLeft");
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
+        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
     }
 
     public override void _PhysicsProcess(float delta) {
 
         if (Input.IsActionJustPressed("ui_restart")) {
             HandleRestart();
+        }
+
+        if (inputDirX > 0)
+        {
+            animatedSprite.FlipH = false;
+        }
+        else if (inputDirX < 0)
+        {
+            animatedSprite.FlipH = true;
         }
         
         // Action
@@ -74,6 +85,14 @@ public class Player : KinematicBody2D
                 HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
+                if (velocity.x == 0)
+                {
+                    animatedSprite.Play("Climb");
+                }
+                else
+                {
+                    animatedSprite.Play("Walk");
+                }
 
                 if (justPressedJump && jumps > 0) {
                     state = PlayerState.Jump;
@@ -113,6 +132,19 @@ public class Player : KinematicBody2D
                 if (balls > 0 && justPressedShoot)
                 {
                     SpawnBall();
+                }
+
+                if (RayIsOnFloor() && velocity.x != 0)
+                {
+                    animatedSprite.Play("Walk");
+                }
+                else if(RayIsOnFloor() && velocity.x == 0)
+                {
+                    animatedSprite.Play("Idle");
+                }
+                else
+                {
+                    animatedSprite.Play("Jump");
                 }
 
                 if (RayIsOnFloor() && justPressedJump && jumps > 0)
