@@ -19,9 +19,10 @@ public class Player : KinematicBody2D
 	private Vector2 E2 = new Vector2(0, -1);
 
     // Nodes
+    private PackedScene projectile = null;
     private RayCast2D floorRayLeft = null;
     private RayCast2D floorRayRight = null;
-
+    
     // Player Constants
     [Export] int ACCELERATION = 1000;
     [Export] int CLIMBSPEED = 50;
@@ -37,8 +38,10 @@ public class Player : KinematicBody2D
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
     private float inputPush = 0;
+    private bool justPressedShoot = false;
     private float inputDirX = 0;
     private float inputDirY = 0;
+    private int balls = 1;
     private int jumps = 1;
     private int jumpBufferFrame = 0;
 
@@ -46,10 +49,10 @@ public class Player : KinematicBody2D
 
     public override void _Ready()
     {
+        projectile = GD.Load<PackedScene>("res://Player/Ball.tscn");
+
         floorRayLeft = GetNode<RayCast2D>("FloorRayLeft");
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
-
-        InitializeVariables();
     }
 
     public override void _PhysicsProcess(float delta)
@@ -71,10 +74,7 @@ public class Player : KinematicBody2D
                 break;
 
             case PlayerState.Death:
-                ResetVariables();
-
-                Position = spawnPos;
-                state = PlayerState.Init;
+                GetTree().ReloadCurrentScene();
                 break;
 
             case PlayerState.Init:
@@ -103,6 +103,11 @@ public class Player : KinematicBody2D
                 HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
+
+                if (balls > 0 && justPressedShoot)
+                {
+                    SpawnBall();
+                }
 
                 if (RayIsOnFloor() && justPressedJump && jumps > 0)
                 {
@@ -152,6 +157,12 @@ public class Player : KinematicBody2D
         }
     }
 
+    private Vector2 GetDirectionBetweenMouseAndPlayer() {
+		float disX = GetGlobalMousePosition().x - GlobalPosition.x;
+		float disY =  GetGlobalMousePosition().y - GlobalPosition.y;
+		return new Vector2(disX, disY);
+	}
+
     private void HandleEffectCollision()
     {
         int collisionCount = GetSlideCount();
@@ -182,8 +193,13 @@ public class Player : KinematicBody2D
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
 
-    private void InitializeVariables()
+    private void SpawnBall()
     {
+        Ball ball = (Ball) projectile.Instance();
+        ball.dir = GetDirectionBetweenMouseAndPlayer();
+        ball.Position = Position;
+        GetParent().AddChild(ball);
+        balls--;
     }
 
     private bool RayIsOnFloor()
@@ -191,16 +207,12 @@ public class Player : KinematicBody2D
         return floorRayRight.IsColliding() || floorRayLeft.IsColliding();
     }
 
-    private void ResetVariables()
-    {
-
-    } 
-
     private void UpdateInputs()
     {
         inputDirX = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
         inputDirY = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
         inputPush = Input.GetActionStrength("ui_push");
+        justPressedShoot = Input.IsActionJustPressed("ui_shoot");
         BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
     }
 
@@ -228,10 +240,18 @@ public class Player : KinematicBody2D
             curLadder.MoveAndSlide(ladderVel);
         }
     }
+    
+    // SIGNALS =======================================================================================================
 
-    // SIGNALS
+    private void AddBall(object area)
+    {
+        balls++;
+        GD.Print("ADDED BALL");
+        GD.Print("Balls: " + balls);
+    }
 
-    private void AddJump(object area) {
+    private void AddJump(object area) 
+    {
         jumps++;
         // DEBUG
         GD.Print("ADDED JUMP");
@@ -250,10 +270,5 @@ public class Player : KinematicBody2D
         curLadder = null;
         velocity.y = 0;
         GD.Print("Exited Ladder");
-    }
-
-    private void UpdateCheckpoint(Vector2 sp)
-    {
-        spawnPos = sp;
     }
 }
