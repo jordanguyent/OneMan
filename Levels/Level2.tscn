@@ -122,4 +122,4 @@ SPEEDXMAX = 66
 [node name="SceneChanger" parent="." instance=ExtResource( 4 )]
 position = Vector2( 266, 111 )
 scale = Vector2( 1, 3 )
-SCENE_NAME = "Level1.tscn"
+SCENE_NAME = "Level3.tscn"
