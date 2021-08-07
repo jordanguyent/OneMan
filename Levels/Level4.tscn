@@ -17,9 +17,6 @@ tile_data = PoolIntArray( -131045, 1, 720897, -131044, 1, 1, -131043, 1, 3, -131
 [node name="JumpPot4" parent="." instance=ExtResource( 3 )]
 position = Vector2( 101, 96 )
 
-[node name="JumpPot3" parent="." instance=ExtResource( 3 )]
-position = Vector2( 52, 82 )
-
 [node name="JumpPot2" parent="." instance=ExtResource( 3 )]
 position = Vector2( 84, 50 )
 
