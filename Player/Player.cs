@@ -286,11 +286,15 @@ public class Player : KinematicBody2D
     
     // SIGNALS =======================================================================================================
 
-    private void AddBall(object area)
+    private void AddBall(Area2D area)
     {
-        balls++;
-        GD.Print("ADDED BALL");
-        GD.Print("Balls: " + balls);
+        GD.Print(area.Name);
+        if (area.Name == "EffectBox")
+        {
+            balls++;
+            GD.Print("ADDED BALL");
+            GD.Print("Balls: " + balls);
+        }
     }
 
     private void AddJump(object area) 

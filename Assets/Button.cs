@@ -5,22 +5,37 @@ public class Button : Area2D
 {
     [Signal] public delegate void area_entered();
 
-    [Export] int DOORID = 1;
+    [Signal] public delegate void toggle_on(int id);
 
-    private Door door = null;
-    private ColorRect rect = null;
+    private int toggle = 0;
+
+    private AnimatedSprite animatedSprite = null;
 
     public override void _Ready()
     {
-        door = GetNode<Door>("../Door" + DOORID);
-        rect = GetNode<ColorRect>("ColorRect");
+        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+       
+        animatedSprite.Play("Up");
 
-        Connect("area_entered", door, "OpenDoor");
-        Connect("area_entered", this, "ButtonDown");
+        //Connect("toggle_on", door, "ToggleDoor");
+        Connect("area_entered", this, "Toggle");
     }
 
-    private void ButtonDown(object area)
+    private void Toggle(object area)
     {
-        rect.Modulate = new Color(1, 0, 0, 1);
+        toggle = (toggle + 1) % 2;
+
+        switch (toggle)
+        {
+            case 0:
+                animatedSprite.Play("Up");
+                //EmitSignal("toggle_on", BUTTONID);
+                break;
+
+            case 1:
+                animatedSprite.Play("Down");
+                //EmitSignal("toggle_on", BUTTONID);
+                break;
+        }
     }
 }
