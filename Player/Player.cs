@@ -55,8 +55,12 @@ public class Player : KinematicBody2D
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
     }
 
-    public override void _PhysicsProcess(float delta)
-    {
+    public override void _PhysicsProcess(float delta) {
+
+        if (Input.IsActionJustPressed("ui_restart")) {
+            HandleRestart();
+        }
+        
         // Action
         // Animation
         // Transition
@@ -190,11 +194,15 @@ public class Player : KinematicBody2D
         }
     }
 
+    private void HandleRestart() {
+        GetTree().ReloadCurrentScene();
+    }
 
     private float HelperMoveToward(float current, float desire, float acceleration)
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
+
 
     private void SpawnBall()
     {
