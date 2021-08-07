@@ -31,4 +31,4 @@ position = Vector2( 5, 124 )
 [node name="SceneChanger" parent="." instance=ExtResource( 5 )]
 position = Vector2( 266, 55 )
 scale = Vector2( 1, 6 )
-SCENE_NAME = "Level5.tscn"
+SCENE_NAME = "Level6.tscn"
