@@ -117,9 +117,12 @@ public class Ball : KinematicBody2D
 
     // Signals
 
-    private void Delete(object area)
+    private void Delete(Area2D area)
     {
         // create area
-        QueueFree();
+        if (area.Name == "EffectBox")
+        {
+            QueueFree();
+        }
     }
 }
