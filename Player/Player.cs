@@ -23,8 +23,9 @@ public class Player : KinematicBody2D
     // Player Constants
     [Export] int ACCELERATION = 1000;
     [Export] int GRAVITY = 500;
-    [Export] int JUMPMAGNITUDE = 100;
-    [Export] int MAXJUMPS = 1;
+    [Export] int JUMPMAGNITUDE = 150;
+    [Export] int INPUTBUFFERFRAMES = 5;
+    [Export] int MAXJUMPS = 10; // should be one
     [Export] int SPEEDXMAX = 50;
     [Export] int SPEEDYMAX = 200;
 
@@ -33,11 +34,15 @@ public class Player : KinematicBody2D
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
     private float inputDirX = 0;
+    private int jumpsLeft = 0;
+    private int jumpBufferFrame = 0;
 
     public override void _Ready()
     {
         floorRayLeft = GetNode<RayCast2D>("FloorRayLeft");
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
+
+        InitializeVariables();
     }
 
     public override void _PhysicsProcess(float delta)
@@ -49,6 +54,7 @@ public class Player : KinematicBody2D
         switch(state)
         {
             case PlayerState.Death:
+                ResetVariables();
                 break;
 
             case PlayerState.Init:
@@ -62,7 +68,10 @@ public class Player : KinematicBody2D
 
                 velocity = MoveAndSlide(velocity, E2);
 
-                
+                if (RayIsOnFloor())
+                {  
+                    state = PlayerState.Move;
+                }
                 break;
 
             case PlayerState.Move:
@@ -72,9 +81,11 @@ public class Player : KinematicBody2D
 
                 velocity = MoveAndSlide(velocity, E2);
 
-                if (justPressedJump)
+                if (RayIsOnFloor() && justPressedJump && jumpsLeft > 0)
                 {
                     state = PlayerState.Jump;
+                    jumpsLeft--;
+                    GD.Print("Jumps: " + jumpsLeft);
                 }
                 break;
         }
@@ -82,20 +93,55 @@ public class Player : KinematicBody2D
         Position = Position.Snapped(Vector2.One);
     }
 
+    private void BufferJustPressedInput(ref bool selfBool, ref int inputBufferFrames, String keypress, bool condition)
+    {
+        if (Input.IsActionJustPressed(keypress))
+        {
+            selfBool = true;
+        }
+
+        if (selfBool && inputBufferFrames < INPUTBUFFERFRAMES)
+        {
+            inputBufferFrames++;
+            // Checks if buffered input has been used
+            if (condition)
+            {
+                inputBufferFrames = 0;
+                selfBool = false;
+            }
+        }
+        else
+        {
+            inputBufferFrames = 0;
+            selfBool = false;
+        }
+    }
+
+
     private float HelperMoveToward(float current, float desire, float acceleration)
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
+
+    private void InitializeVariables()
+    {
+        jumpsLeft = MAXJUMPS;
+    }
 
     private bool RayIsOnFloor()
     {
         return floorRayRight.IsColliding() || floorRayLeft.IsColliding();
     }
 
+    private void ResetVariables()
+    {
+
+    }
+
     private void UpdateInputs()
     {
         inputDirX = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-        justPressedJump = Input.IsActionJustPressed("ui_jump");
+        BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
     }
 
     private void UpdateVelocityX(float delta)
@@ -129,6 +175,7 @@ public class Player : KinematicBody2D
                 break;
 
             case PlayerState.Jump:
+                velocity.y -= JUMPMAGNITUDE;
                 break;
 
             case PlayerState.Move:
