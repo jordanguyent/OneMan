@@ -6,12 +6,12 @@ public class Player : KinematicBody2D
     // Player States
     enum PlayerState
     {
-        Climb,
+        Climb,  // Climbing the ladder
         Death,
         Init,
         Jump,
         Move,
-        Push
+        Push    // Pushing the ladder
     }
 
     // Universal Constants
@@ -39,7 +39,7 @@ public class Player : KinematicBody2D
     private float inputPush = 0;
     private float inputDirX = 0;
     private float inputDirY = 0;
-    private int jumps = 1;
+    private int jumps = 10;
     private int jumpBufferFrame = 0;
 
     private KinematicBody2D curLadder = null;
@@ -57,6 +57,7 @@ public class Player : KinematicBody2D
         // Action
         // Animation
         // Transition
+        GD.Print(state);
 
         switch(state)
         {
@@ -68,6 +69,11 @@ public class Player : KinematicBody2D
 
                 velocity = MoveAndSlide(velocity, E2);
 
+                if (justPressedJump && jumps > 0) {
+                    state = PlayerState.Jump;
+                    jumps--;
+                    GD.Print("Jumps: " + jumps);
+                }
                 break;
 
             case PlayerState.Death:
@@ -90,10 +96,7 @@ public class Player : KinematicBody2D
 
                 velocity = MoveAndSlide(velocity, E2);
 
-                if (RayIsOnFloor())
-                {  
-                    state = PlayerState.Move;
-                }
+                state = PlayerState.Move;
                 break;
 
             case PlayerState.Move:
@@ -149,6 +152,12 @@ public class Player : KinematicBody2D
         {
             inputBufferFrames = 0;
             selfBool = false;
+        }
+    }
+
+    private void ClimbLadder() {
+        if (inputDirY < 0) {
+            state = PlayerState.Climb;
         }
     }
 
@@ -214,6 +223,7 @@ public class Player : KinematicBody2D
     }
 
     private void UpdateVelocityJump(float delta) {
+        velocity.y = 0;
         velocity.y -= JUMPMAGNITUDE;
     }
 
@@ -248,7 +258,7 @@ public class Player : KinematicBody2D
     private void OnExitLadder(Area2D param) {
         state = PlayerState.Move;
         curLadder = null;
-        velocity.y = 0;
+        // velocity.y = 0;
         GD.Print("Exited Ladder");
     }
 

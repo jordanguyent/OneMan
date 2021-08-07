@@ -11,9 +11,13 @@ public class Ladder : KinematicBody2D
     [Signal] public delegate void area_entered();
     [Signal] public delegate void area_exited();
 
+    [Export] int GRAVITY = 500;
+    [Export] int SPEEDYMAX = 200;
+
     private Player player = null;
 
     private Area2D area2D = null;
+    private Vector2 gravVec = new Vector2();
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
@@ -29,6 +33,8 @@ public class Ladder : KinematicBody2D
 
     public override void _PhysicsProcess(float delta) {
         this.Position = Position.Snapped(Vector2.One);
+        gravVec = gravVec.MoveToward(new Vector2(0, SPEEDYMAX), GRAVITY * delta);
+        gravVec = MoveAndSlide(gravVec);
     }
 
     private void OnAreaEntered(object param) {
