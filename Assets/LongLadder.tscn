@@ -4,7 +4,7 @@
 [ext_resource path="res://Sprites/ShortLadder.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 4, 9 )
+extents = Vector2( 4, 8.5 )
 
 [node name="Ladder" type="KinematicBody2D"]
 collision_layer = 0
