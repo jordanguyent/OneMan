@@ -10,7 +10,8 @@ public class Player : KinematicBody2D
         Death,
         Init,
         Jump,
-        Move
+        Move,
+        Push
     }
 
     // Universal Constants
@@ -35,11 +36,13 @@ public class Player : KinematicBody2D
     private Vector2 spawnPos = new Vector2();
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
+    private float inputPush = 0;
     private float inputDirX = 0;
     private float inputDirY = 0;
     private int jumps = 1;
     private int jumpBufferFrame = 0;
 
+    private KinematicBody2D curLadder = null;
 
     public override void _Ready()
     {
@@ -59,6 +62,7 @@ public class Player : KinematicBody2D
         {
             case PlayerState.Climb:
                 UpdateInputs();
+                HandleLadderStates();
                 UpdateVelocityX(delta);
                 UpdateVelocityClimb(delta);
 
@@ -107,6 +111,18 @@ public class Player : KinematicBody2D
                     GD.Print("Jumps: " + jumps);
                 }
                 break;
+            
+            case PlayerState.Push:
+                UpdateInputs();
+                HandleLadderStates();
+                UpdateVelocityX(delta);
+                UpdateVelocityGravity(delta);
+                UpdateVelocityLadder(delta);
+                HandleEffectCollision();
+
+                velocity = MoveAndSlide(velocity, E2);
+
+                break;
         }
 
         Position = Position.Snapped(Vector2.One);
@@ -151,6 +167,15 @@ public class Player : KinematicBody2D
         }
     }
 
+    // Check whether player is climbing/moving
+    private void HandleLadderStates() {
+        if (inputPush != 0 && RayIsOnFloor()) {
+            state = PlayerState.Push;
+        } else {
+            state = PlayerState.Climb;
+        }
+    }
+
 
     private float HelperMoveToward(float current, float desire, float acceleration)
 	{
@@ -175,6 +200,7 @@ public class Player : KinematicBody2D
     {
         inputDirX = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
         inputDirY = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
+        inputPush = Input.GetActionStrength("ui_push");
         BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
     }
 
@@ -195,6 +221,14 @@ public class Player : KinematicBody2D
         velocity.y = HelperMoveToward(velocity.y, SPEEDYMAX, GRAVITY * delta);
     }
 
+    private void UpdateVelocityLadder(float delta) {
+        if (curLadder != null) {
+            Vector2 ladderVel = velocity;
+            ladderVel.y = 0;
+            curLadder.MoveAndSlide(ladderVel);
+        }
+    }
+
     // SIGNALS
 
     private void AddJump(object area) {
@@ -204,13 +238,16 @@ public class Player : KinematicBody2D
         GD.Print("Jumps: " + jumps);
     }
 
-    private void OnEnterLadder(object param) {
-        state = PlayerState.Climb;
+    private void OnEnterLadder(KinematicBody2D ladder) {
+        HandleLadderStates();
+        curLadder = ladder;
+        GD.Print(curLadder.GetChildCount());
         GD.Print("Entered Ladder");
     }
 
-    private void OnExitLadder(object param) {
+    private void OnExitLadder(Area2D param) {
         state = PlayerState.Move;
+        curLadder = null;
         velocity.y = 0;
         GD.Print("Exited Ladder");
     }
