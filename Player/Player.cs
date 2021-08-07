@@ -64,8 +64,6 @@ public class Player : KinematicBody2D
         // Action
         // Animation
         // Transition
-        GD.Print(state);
-
         switch(state)
         {
             case PlayerState.Climb:
