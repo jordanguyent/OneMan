@@ -80,13 +80,9 @@ public class Player : KinematicBody2D
             case PlayerState.Jump:
                 UpdateInputs();
                 UpdateVelocityX(delta);
-<<<<<<< HEAD
-                UpdateVelocityY(delta);
-                HandleEffectCollision();
-=======
                 UpdateVelocityGravity(delta);
                 UpdateVelocityJump(delta);
->>>>>>> Add ladder asset and update player movement
+                HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -99,12 +95,8 @@ public class Player : KinematicBody2D
             case PlayerState.Move:
                 UpdateInputs();
                 UpdateVelocityX(delta);
-<<<<<<< HEAD
-                UpdateVelocityY(delta);
-                HandleEffectCollision();
-=======
                 UpdateVelocityGravity(delta);
->>>>>>> Add ladder asset and update player movement
+                HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -212,11 +204,6 @@ public class Player : KinematicBody2D
         GD.Print("Jumps: " + jumps);
     }
 
-<<<<<<< HEAD
-    private void UpdateCheckpoint(Vector2 sp)
-    {
-        spawnPos = sp;
-=======
     private void OnEnterLadder(object param) {
         state = PlayerState.Climb;
         GD.Print("Entered Ladder");
@@ -226,6 +213,10 @@ public class Player : KinematicBody2D
         state = PlayerState.Move;
         velocity.y = 0;
         GD.Print("Exited Ladder");
->>>>>>> Add ladder asset and update player movement
+    }
+
+    private void UpdateCheckpoint(Vector2 sp)
+    {
+        spawnPos = sp;
     }
 }
