@@ -25,7 +25,6 @@ public class Player : KinematicBody2D
     [Export] int GRAVITY = 500;
     [Export] int JUMPMAGNITUDE = 150;
     [Export] int INPUTBUFFERFRAMES = 5;
-    [Export] int MAXJUMPS = 10; // should be one
     [Export] int SPEEDXMAX = 50;
     [Export] int SPEEDYMAX = 200;
 
@@ -34,7 +33,7 @@ public class Player : KinematicBody2D
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
     private float inputDirX = 0;
-    private int jumpsLeft = 0;
+    private int jumps = 1;
     private int jumpBufferFrame = 0;
 
     public override void _Ready()
@@ -81,11 +80,11 @@ public class Player : KinematicBody2D
 
                 velocity = MoveAndSlide(velocity, E2);
 
-                if (RayIsOnFloor() && justPressedJump && jumpsLeft > 0)
+                if (RayIsOnFloor() && justPressedJump && jumps > 0)
                 {
                     state = PlayerState.Jump;
-                    jumpsLeft--;
-                    GD.Print("Jumps: " + jumpsLeft);
+                    jumps--;
+                    GD.Print("Jumps: " + jumps);
                 }
                 break;
         }
@@ -125,7 +124,6 @@ public class Player : KinematicBody2D
 
     private void InitializeVariables()
     {
-        jumpsLeft = MAXJUMPS;
     }
 
     private bool RayIsOnFloor()
@@ -181,5 +179,14 @@ public class Player : KinematicBody2D
             case PlayerState.Move:
                 break;
         }
+    }
+
+    // SIGNALS
+
+    private void AddJump(object area) {
+        jumps++;
+        // DEBUG
+        GD.Print("ADDED JUMP");
+        GD.Print("Jumps: " + jumps);
     }
 }
