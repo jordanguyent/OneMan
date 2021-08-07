@@ -46,6 +46,9 @@ public class Player : KinematicBody2D
     private int jumps = 1;
     private int jumpBufferFrame = 0;
 
+    // UI vars
+    private Label jumpLabel = null;
+
     private KinematicBody2D curLadder = null;
 
     public override void _Ready()
@@ -55,9 +58,15 @@ public class Player : KinematicBody2D
         floorRayLeft = GetNode<RayCast2D>("FloorRayLeft");
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        jumpLabel = GetNode<Label>("Label");
+
+        jumpLabel.SetAsToplevel(true);
+        jumpLabel.SetPosition(new Vector2(20, 10));
     }
 
     public override void _PhysicsProcess(float delta) {
+
+        UpdateJumpUI();
 
         if (Input.IsActionJustPressed("ui_restart")) {
             HandleRestart();
@@ -234,7 +243,6 @@ public class Player : KinematicBody2D
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
 
-
     private void SpawnBall()
     {
         Ball ball = (Ball) projectile.Instance();
@@ -256,6 +264,11 @@ public class Player : KinematicBody2D
         inputPush = Input.GetActionStrength("ui_push");
         justPressedShoot = Input.IsActionJustPressed("ui_shoot");
         BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
+    }
+
+    private void UpdateJumpUI()
+    {
+        jumpLabel.Text = jumps.ToString();
     }
 
     private void UpdateVelocityX(float delta)
