@@ -33,7 +33,9 @@ points = PoolVector2Array( 8, 8, 0, 8, 0, 0, 8, 0 )
 [node name="World" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
-position = Vector2( 36, 44 )
+position = Vector2( 128, 112 )
+ACCELERATION = 1500
+SPEEDXMAX = 100
 
 [node name="TMBlocks" parent="." instance=ExtResource( 2 )]
 tile_set = SubResource( 2 )
