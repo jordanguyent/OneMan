@@ -6,6 +6,7 @@ public class Player : KinematicBody2D
     // Player States
     enum PlayerState
     {
+        Climb,
         Death,
         Init,
         Jump,
@@ -22,6 +23,7 @@ public class Player : KinematicBody2D
 
     // Player Constants
     [Export] int ACCELERATION = 1000;
+    [Export] int CLIMBSPEED = 50;
     [Export] int GRAVITY = 500;
     [Export] int JUMPMAGNITUDE = 150;
     [Export] int INPUTBUFFERFRAMES = 5;
@@ -34,8 +36,10 @@ public class Player : KinematicBody2D
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
     private float inputDirX = 0;
+    private float inputDirY = 0;
     private int jumps = 1;
     private int jumpBufferFrame = 0;
+
 
     public override void _Ready()
     {
@@ -53,6 +57,15 @@ public class Player : KinematicBody2D
 
         switch(state)
         {
+            case PlayerState.Climb:
+                UpdateInputs();
+                UpdateVelocityX(delta);
+                UpdateVelocityClimb(delta);
+
+                velocity = MoveAndSlide(velocity, E2);
+
+                break;
+
             case PlayerState.Death:
                 ResetVariables();
 
@@ -67,8 +80,13 @@ public class Player : KinematicBody2D
             case PlayerState.Jump:
                 UpdateInputs();
                 UpdateVelocityX(delta);
+<<<<<<< HEAD
                 UpdateVelocityY(delta);
                 HandleEffectCollision();
+=======
+                UpdateVelocityGravity(delta);
+                UpdateVelocityJump(delta);
+>>>>>>> Add ladder asset and update player movement
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -81,8 +99,12 @@ public class Player : KinematicBody2D
             case PlayerState.Move:
                 UpdateInputs();
                 UpdateVelocityX(delta);
+<<<<<<< HEAD
                 UpdateVelocityY(delta);
                 HandleEffectCollision();
+=======
+                UpdateVelocityGravity(delta);
+>>>>>>> Add ladder asset and update player movement
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -160,46 +182,25 @@ public class Player : KinematicBody2D
     private void UpdateInputs()
     {
         inputDirX = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
+        inputDirY = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
         BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
     }
 
     private void UpdateVelocityX(float delta)
     {
-        switch(state)
-        {
-            case PlayerState.Death:
-                break;
-
-            case PlayerState.Init:
-                break;
-
-            case PlayerState.Jump:
-            case PlayerState.Move:
-                velocity.x = HelperMoveToward(velocity.x, inputDirX * SPEEDXMAX, ACCELERATION * delta);
-                break;
-        }
+        velocity.x = HelperMoveToward(velocity.x, inputDirX * SPEEDXMAX, ACCELERATION * delta);
     }
 
-    private void UpdateVelocityY(float delta)
-    {
-        // Gravity
+    private void UpdateVelocityClimb(float delta) {
+        velocity.y = HelperMoveToward(velocity.y, inputDirY * CLIMBSPEED, ACCELERATION * delta);
+    }
+
+    private void UpdateVelocityJump(float delta) {
+        velocity.y -= JUMPMAGNITUDE;
+    }
+
+    private void UpdateVelocityGravity(float delta) {
         velocity.y = HelperMoveToward(velocity.y, SPEEDYMAX, GRAVITY * delta);
-
-        switch(state)
-        {
-            case PlayerState.Death:
-                break;
-
-            case PlayerState.Init:
-                break;
-
-            case PlayerState.Jump:
-                velocity.y -= JUMPMAGNITUDE;
-                break;
-
-            case PlayerState.Move:
-                break;
-        }
     }
 
     // SIGNALS
@@ -211,8 +212,20 @@ public class Player : KinematicBody2D
         GD.Print("Jumps: " + jumps);
     }
 
+<<<<<<< HEAD
     private void UpdateCheckpoint(Vector2 sp)
     {
         spawnPos = sp;
+=======
+    private void OnEnterLadder(object param) {
+        state = PlayerState.Climb;
+        GD.Print("Entered Ladder");
+    }
+
+    private void OnExitLadder(object param) {
+        state = PlayerState.Move;
+        velocity.y = 0;
+        GD.Print("Exited Ladder");
+>>>>>>> Add ladder asset and update player movement
     }
 }
