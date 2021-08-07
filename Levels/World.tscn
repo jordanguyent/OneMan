@@ -1,17 +1,8 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://TileMaps/TMBlocks.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Player/CamSettingArea.tscn" type="PackedScene" id=3]
 [ext_resource path="res://TileMaps/TMDanger.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Player/Checkpoint.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Assets/Ladder.tscn" type="PackedScene" id=6]
-
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 116, 72 )
-
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 8, 16 )
 
 [node name="World" type="Node2D"]
 
@@ -26,27 +17,4 @@ tile_data = PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 
 [node name="TMDanger" parent="." instance=ExtResource( 4 )]
 tile_data = PoolIntArray( 983053, 0, 1, 983058, 0, 3, 1048589, 0, 0, 1048590, 0, 0, 1048591, 0, 0, 1048592, 0, 0, 1048593, 0, 0, 1048594, 0, 0 )
 
-[node name="CamSetters" type="Node2D" parent="."]
-
-[node name="CamSettingArea" parent="CamSetters" instance=ExtResource( 3 )]
-position = Vector2( 124, 80 )
-
-[node name="CollisionShape2D" parent="CamSetters/CamSettingArea" index="0"]
-shape = SubResource( 1 )
-
-[node name="Checkpoints" type="Node2D" parent="."]
-
-[node name="Checkpoint" parent="Checkpoints" instance=ExtResource( 5 )]
-position = Vector2( 16, 112 )
-
-[node name="CollisionShape2D" parent="Checkpoints/Checkpoint" index="0"]
-shape = SubResource( 2 )
-
-[node name="Ladder" parent="Checkpoints/Checkpoint" instance=ExtResource( 6 )]
-position = Vector2( 56, 0 )
-
 [node name="JumpNodes" type="Node2D" parent="."]
-
-[editable path="CamSetters/CamSettingArea"]
-
-[editable path="Checkpoints/Checkpoint"]
