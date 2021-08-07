@@ -30,6 +30,7 @@ public class Player : KinematicBody2D
 
     // Player Variables
     private PlayerState state = PlayerState.Init;
+    private Vector2 spawnPos = new Vector2();
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
     private float inputDirX = 0;
@@ -54,6 +55,9 @@ public class Player : KinematicBody2D
         {
             case PlayerState.Death:
                 ResetVariables();
+
+                Position = spawnPos;
+                state = PlayerState.Init;
                 break;
 
             case PlayerState.Init:
@@ -64,6 +68,7 @@ public class Player : KinematicBody2D
                 UpdateInputs();
                 UpdateVelocityX(delta);
                 UpdateVelocityY(delta);
+                HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -77,6 +82,7 @@ public class Player : KinematicBody2D
                 UpdateInputs();
                 UpdateVelocityX(delta);
                 UpdateVelocityY(delta);
+                HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -116,6 +122,21 @@ public class Player : KinematicBody2D
         }
     }
 
+    private void HandleEffectCollision()
+    {
+        int collisionCount = GetSlideCount();
+
+        for(int i = 0; i < collisionCount; i++)
+        {
+            KinematicCollision2D currentCollision = GetSlideCollision(i);
+            Godot.Object collidedWith = currentCollision.Collider;
+            if ((collidedWith as TMDanger) != null)
+            {
+                state = PlayerState.Death;
+            }
+        }
+    }
+
 
     private float HelperMoveToward(float current, float desire, float acceleration)
 	{
@@ -134,7 +155,7 @@ public class Player : KinematicBody2D
     private void ResetVariables()
     {
 
-    }
+    } 
 
     private void UpdateInputs()
     {
@@ -188,5 +209,10 @@ public class Player : KinematicBody2D
         // DEBUG
         GD.Print("ADDED JUMP");
         GD.Print("Jumps: " + jumps);
+    }
+
+    private void UpdateCheckpoint(Vector2 sp)
+    {
+        spawnPos = sp;
     }
 }
