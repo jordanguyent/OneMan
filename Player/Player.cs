@@ -32,7 +32,7 @@ public class Player : KinematicBody2D
     [Export] int INPUTBUFFERFRAMES = 5;
     [Export] int SPEEDXMAX = 50;
     [Export] int SPEEDYMAX = 200;
-    [Export] int COYOTEFRAMES = 5;
+    [Export] int COYOTEFRAMES = 3;
 
     // Player Variables
     private PlayerState state = PlayerState.Init;
