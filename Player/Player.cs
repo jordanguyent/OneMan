@@ -32,17 +32,20 @@ public class Player : KinematicBody2D
     [Export] int INPUTBUFFERFRAMES = 5;
     [Export] int SPEEDXMAX = 50;
     [Export] int SPEEDYMAX = 200;
+    [Export] int COYOTEFRAMES = 5;
 
     // Player Variables
     private PlayerState state = PlayerState.Init;
     private Vector2 spawnPos = new Vector2();
     private Vector2 velocity = new Vector2();
     private bool justPressedJump = false;
-    private float inputPush = 0;
     private bool justPressedShoot = false;
+    private bool quit = false;
     private float inputDirX = 0;
     private float inputDirY = 0;
+    private float inputPush = 0;
     private int balls = 1;
+    private int coyoteFrame = 0;
     private int jumps = 1;
     private int jumpBufferFrame = 0;
 
@@ -79,6 +82,11 @@ public class Player : KinematicBody2D
         else if (inputDirX < 0)
         {
             animatedSprite.FlipH = true;
+        }
+
+        if (quit)
+        {
+            GetTree().Quit();
         }
         
         // Action
@@ -126,6 +134,7 @@ public class Player : KinematicBody2D
                 HandleEffectCollision();
 
                 velocity = MoveAndSlide(velocity, E2);
+                coyoteFrame = COYOTEFRAMES;
 
                 state = PlayerState.Move;
                 break;
@@ -177,7 +186,9 @@ public class Player : KinematicBody2D
                 break;
         }
 
+        coyoteFrame++;
         Position = Position.Snapped(Vector2.One);
+        
     }
 
     private void BufferJustPressedInput(ref bool selfBool, ref int inputBufferFrames, String keypress, bool condition)
@@ -254,7 +265,11 @@ public class Player : KinematicBody2D
 
     private bool RayIsOnFloor()
     {
-        return floorRayRight.IsColliding() || floorRayLeft.IsColliding();
+        if (floorRayRight.IsColliding() || floorRayLeft.IsColliding())
+        {
+            coyoteFrame = 0;
+        }
+        return coyoteFrame < COYOTEFRAMES;
     }
 
     private void UpdateInputs()
@@ -263,6 +278,7 @@ public class Player : KinematicBody2D
         inputDirY = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
         inputPush = Input.GetActionStrength("ui_push");
         justPressedShoot = Input.IsActionJustPressed("ui_shoot");
+        quit = Input.IsActionJustPressed("ui_cancel");
         BufferJustPressedInput(ref justPressedJump, ref jumpBufferFrame, "ui_jump", state == PlayerState.Jump);
     }
 
@@ -286,7 +302,15 @@ public class Player : KinematicBody2D
     }
 
     private void UpdateVelocityGravity(float delta) {
-        velocity.y = HelperMoveToward(velocity.y, SPEEDYMAX, GRAVITY * delta);
+        if (!RayIsOnFloor())
+        {
+            velocity.y = HelperMoveToward(velocity.y, SPEEDYMAX, GRAVITY * delta);
+        }
+        else 
+        {
+            velocity.y = 0;
+        }
+        
     }
 
     private void UpdateVelocityLadder(float delta) {
