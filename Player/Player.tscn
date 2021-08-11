@@ -1,8 +1,12 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://Player/Player.cs" type="Script" id=1]
 [ext_resource path="res://Sprites/Player.png" type="Texture" id=2]
 [ext_resource path="res://Sprites/jump.png" type="Texture" id=3]
+[ext_resource path="res://Sounds/Jump.wav" type="AudioStream" id=4]
+[ext_resource path="res://Sounds/Step.wav" type="AudioStream" id=5]
+[ext_resource path="res://Sounds/Death.wav" type="AudioStream" id=6]
+[ext_resource path="res://Sounds/Jumpup.wav" type="AudioStream" id=7]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 2 )
@@ -54,12 +58,12 @@ animations = [ {
 }, {
 "frames": [ SubResource( 8 ) ],
 "loop": false,
-"name": "Idle",
+"name": "Jump",
 "speed": 5.0
 }, {
 "frames": [ SubResource( 9 ) ],
 "loop": false,
-"name": "Jump",
+"name": "Idle",
 "speed": 5.0
 } ]
 
@@ -112,3 +116,18 @@ __meta__ = {
 position = Vector2( -7, 6 )
 scale = Vector2( 1.66667, 2 )
 texture = ExtResource( 3 )
+
+[node name="JumpSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="WalkSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = 3.0
+pitch_scale = 0.4
+
+[node name="DeathSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+
+[node name="JumpUpSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 7 )
+volume_db = -3.0

@@ -10,10 +10,12 @@ public class Button : Area2D
     private int toggle = 0;
 
     private AnimatedSprite animatedSprite = null;
+    private AudioStreamPlayer sfx = null;
 
     public override void _Ready()
     {
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        sfx = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
        
         animatedSprite.Play("Up");
 
@@ -24,6 +26,8 @@ public class Button : Area2D
     private void Toggle(object area)
     {
         toggle = (toggle + 1) % 2;
+
+        sfx.Play();
 
         switch (toggle)
         {

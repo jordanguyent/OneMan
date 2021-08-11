@@ -16,6 +16,7 @@ public class Ball : KinematicBody2D
 
     private Player player = null;
     private Area2D hitBox = null;
+    private AudioStreamPlayer sfx = null;
 
     private const int ACCELERATION = 500;
     private const int GRAVITY = 500;
@@ -32,9 +33,12 @@ public class Ball : KinematicBody2D
     {
         player = GetNode<Player>("/root/World/Player");
         hitBox = GetNode<Area2D>("HitBox");
+        sfx = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 
         hitBox.Connect("area_entered", this, "Delete");
         hitBox.Connect("area_entered", player, "AddBall");
+
+        sfx.Play();
     }
 
     public override void _PhysicsProcess(float delta)
@@ -80,6 +84,7 @@ public class Ball : KinematicBody2D
 
         if (collisionCount > 0)
         {
+            sfx.Play();
             var currentCollision = GetSlideCollision(0);
             if (currentCollision != null)
             {

@@ -23,6 +23,10 @@ public class Player : KinematicBody2D
     private RayCast2D floorRayLeft = null;
     private RayCast2D floorRayRight = null;
     private AnimatedSprite animatedSprite = null;
+    private AudioStreamPlayer deathSFX = null;
+    private AudioStreamPlayer jumpSFX = null;
+    private AudioStreamPlayer jumpupSFX = null;
+    private AudioStreamPlayer walkSFX = null;
     
     // Player Constants
     [Export] int ACCELERATION = 1000;
@@ -33,6 +37,7 @@ public class Player : KinematicBody2D
     [Export] int SPEEDXMAX = 50;
     [Export] int SPEEDYMAX = 200;
     [Export] int COYOTEFRAMES = 3;
+    private int WALKINTERVAL = 10;
 
     // Player Variables
     private PlayerState state = PlayerState.Init;
@@ -46,8 +51,10 @@ public class Player : KinematicBody2D
     private float inputPush = 0;
     private int balls = 1;
     private int coyoteFrame = 0;
+    private int deathTimer = 20;
     private int jumps = 1;
     private int jumpBufferFrame = 0;
+    private int walkCounter;
 
     // UI vars
     private Label jumpLabel = null;
@@ -62,9 +69,15 @@ public class Player : KinematicBody2D
         floorRayRight = GetNode<RayCast2D>("FloorRayRight");
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         jumpLabel = GetNode<Label>("Label");
+        deathSFX = GetNode<AudioStreamPlayer>("DeathSFX");
+        jumpSFX = GetNode<AudioStreamPlayer>("JumpSFX");
+        jumpupSFX = GetNode<AudioStreamPlayer>("JumpUpSFX");
+        walkSFX = GetNode<AudioStreamPlayer>("WalkSFX");
 
         jumpLabel.SetAsToplevel(true);
         jumpLabel.SetPosition(new Vector2(20, 10));
+
+        walkCounter = WALKINTERVAL;
     }
 
     public override void _PhysicsProcess(float delta) {
@@ -101,6 +114,15 @@ public class Player : KinematicBody2D
                 UpdateVelocityClimb(delta);
                 HandleEffectCollision();
 
+                if (velocity != Vector2.Zero)
+                {
+                    PlayWalkSFX();
+                }
+                else
+                {
+                    walkCounter = WALKINTERVAL;
+                }
+
                 velocity = MoveAndSlide(velocity, E2);
                 if (velocity.x == 0)
                 {
@@ -119,7 +141,16 @@ public class Player : KinematicBody2D
                 break;
 
             case PlayerState.Death:
-                GetTree().ReloadCurrentScene();
+                if (deathTimer == 20)
+                {
+                    deathSFX.Play();
+                }   
+                
+                deathTimer--;
+                if (deathTimer < 0)
+                {
+                    GetTree().ReloadCurrentScene();
+                }
                 break;
 
             case PlayerState.Init:
@@ -136,6 +167,8 @@ public class Player : KinematicBody2D
                 velocity = MoveAndSlide(velocity, E2);
                 coyoteFrame = COYOTEFRAMES;
 
+                jumpSFX.Play();
+
                 state = PlayerState.Move;
                 break;
 
@@ -144,6 +177,15 @@ public class Player : KinematicBody2D
                 UpdateVelocityX(delta);
                 UpdateVelocityGravity(delta);
                 HandleEffectCollision();
+
+                if (velocity.x != 0 && RayIsOnFloor())
+                {
+                    PlayWalkSFX();
+                }
+                else
+                {
+                    walkCounter = WALKINTERVAL;
+                }
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -180,6 +222,15 @@ public class Player : KinematicBody2D
                 UpdateVelocityGravity(delta);
                 UpdateVelocityLadder(delta);
                 HandleEffectCollision();
+
+                if (velocity.x != 0 && RayIsOnFloor())
+                {
+                    PlayWalkSFX();
+                }
+                else
+                {
+                    walkCounter = WALKINTERVAL;
+                }
 
                 velocity = MoveAndSlide(velocity, E2);
 
@@ -253,6 +304,16 @@ public class Player : KinematicBody2D
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
+
+    private void PlayWalkSFX()
+    {
+        walkCounter++;
+        if (walkCounter > WALKINTERVAL)
+        {
+            walkSFX.Play();
+            walkCounter = 0;
+        }
+    }
 
     private void SpawnBall()
     {
@@ -336,6 +397,7 @@ public class Player : KinematicBody2D
 
     private void AddJump(object area) 
     {
+        jumpupSFX.Play();
         jumps++;
         // DEBUG
         GD.Print("ADDED JUMP");

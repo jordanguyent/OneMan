@@ -10,6 +10,7 @@ public class Door : KinematicBody2D
 
     private AnimatedSprite animatedSprite = null;
     private Button button = null;
+    private AudioStreamPlayer sfx = null;
     private int toggle = 0;
 
     public override void _Ready()
@@ -25,6 +26,7 @@ public class Door : KinematicBody2D
 
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         button = GetNode<Button>("../Button" + BUTTONID);
+        sfx = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 
         button.Connect("area_entered", this, "ToggleDoor");
     }
@@ -63,6 +65,7 @@ public class Door : KinematicBody2D
 
     private void ToggleDoor(object area)
     {
+        sfx.Play();
         toggle = (toggle + 1) % 4;
     }
 }
